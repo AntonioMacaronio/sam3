@@ -1,0 +1,22 @@
+### Server
+
+Start the server (this machine):
+
+```
+cd /home/anthony/sam3
+python sam3_server.py
+```
+
+The model loads once at startup. Server listens on port 8000.
+
+
+### Client
+From a client machine:
+from sam3_client import SAM3Client
+
+client = SAM3Client("http://YOUR_SERVER_IP:8000")
+masks = client.predict("image.jpg", "light purple square")
+# masks is numpy array with shape (N, 1, H, W)
+
+Or via command line:
+python sam3_client.py --server http://YOUR_SERVER_IP:8000 --image photo.jpg --prompt "person" --output masks.npy
