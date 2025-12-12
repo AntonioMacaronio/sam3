@@ -43,7 +43,10 @@ def send_image_for_prediction(
     endpoint = f"{server_url.rstrip('/')}/predict"
 
     with open(image_path, 'rb') as f:
-        files = {'image': (os.path.basename(image_path), f, 'image/jpeg')}
+        files = {'image': ( # files is a dictionary with a single key 'image' with value = len(3) tuple
+            os.path.basename(image_path),   # filename with extension, ex: "photo.jpg"
+            f,                              # file content (bytes)
+            'image/jpeg')}                  # MIME type (image/jpeg)
         data = {
             'text_prompt': text_prompt,
             'confidence_threshold': confidence_threshold
