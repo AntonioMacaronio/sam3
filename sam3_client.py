@@ -52,7 +52,9 @@ def send_saved_image_for_prediction(
             'text_prompt': text_prompt,
             'confidence_threshold': confidence_threshold
         }
-        response = requests.post(endpoint, files=files, data=data)
+        # Header to bypass ngrok's free tier browser warning page
+        headers = {'ngrok-skip-browser-warning': 'true'}
+        response = requests.post(endpoint, files=files, data=data, headers=headers)
 
     if response.status_code != 200:
         raise Exception(f"Server error: {response.status_code} - {response.text}")
@@ -93,7 +95,9 @@ def send_PIL_image_for_prediction(
         'text_prompt': text_prompt,
         'confidence_threshold': confidence_threshold
     }
-    response = requests.post(endpoint, files=files, data=data)
+    # Header to bypass ngrok's free tier browser warning page
+    headers = {'ngrok-skip-browser-warning': 'true'}
+    response = requests.post(endpoint, files=files, data=data, headers=headers)
 
     if response.status_code != 200:
         raise Exception(f"Server error: {response.status_code} - {response.text}")
@@ -187,7 +191,8 @@ def decode_masks(result: dict) -> list:
 def check_server_health(server_url: str) -> bool:
     """Check if the server is ready."""
     try:
-        response = requests.get(f"{server_url.rstrip('/')}/health", timeout=5)
+        headers = {'ngrok-skip-browser-warning': 'true'}
+        response = requests.get(f"{server_url.rstrip('/')}/health", timeout=5, headers=headers)
         if response.status_code == 200:
             data = response.json()
             return data.get('model_loaded', False)
