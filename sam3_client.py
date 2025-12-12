@@ -19,7 +19,7 @@ import os
 # import matplotlib.pyplot as plt
 import numpy as np
 import requests
-from PIL import Image
+# from PIL import Image
 
 
 def send_image_for_prediction(
@@ -59,14 +59,14 @@ def send_image_for_prediction(
     return response.json()
 
 
-def decode_masks(result: dict) -> list:
-    """Decode base64-encoded masks to numpy arrays."""
-    masks = []
-    for mask_b64 in result.get('masks', []):
-        mask_bytes = base64.b64decode(mask_b64)
-        mask_img = Image.open(io.BytesIO(mask_bytes))
-        masks.append(np.array(mask_img))
-    return masks
+# def decode_masks(result: dict) -> list:
+#     """Decode base64-encoded masks to numpy arrays."""
+#     masks = []
+#     for mask_b64 in result.get('masks', []):
+#         mask_bytes = base64.b64decode(mask_b64)
+#         mask_img = Image.open(io.BytesIO(mask_bytes))
+#         masks.append(np.array(mask_img))
+#     return masks
 
 
 # def visualize_results(image_path: str, result: dict, save_path: str = None):
