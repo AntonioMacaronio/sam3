@@ -19,10 +19,11 @@ import os
 # import matplotlib.pyplot as plt
 import numpy as np
 import requests
-# from PIL import Image
+from PIL import Image
+from PIL.Image import Image as PILImage
 
 
-def send_image_for_prediction(
+def send_saved_image_for_prediction(
     server_url: str,
     image_path: str,
     text_prompt: str,
@@ -58,15 +59,56 @@ def send_image_for_prediction(
 
     return response.json()
 
+def send_PIL_image_for_prediction(
+    server_url: str,
+    image: PILImage, # (PIL.Image.Image)
+    image_name: str,
+    text_prompt: str,
+    confidence_threshold: float = 0.5
+) -> dict:
+    """
+    Send a PIL image to the SAM3 server for segmentation.
 
-# def decode_masks(result: dict) -> list:
-#     """Decode base64-encoded masks to numpy arrays."""
-#     masks = []
-#     for mask_b64 in result.get('masks', []):
-#         mask_bytes = base64.b64decode(mask_b64)
-#         mask_img = Image.open(io.BytesIO(mask_bytes))
-#         masks.append(np.array(mask_img))
-#     return masks
+    Args:
+        server_url: The ngrok URL of the SAM3 server (e.g., "https://abc123.ngrok.io")
+        image: PIL image
+        text_prompt: Text description of what to segment
+        confidence_threshold: Detection confidence threshold (0.0-1.0)
+
+    Returns:
+        Dictionary with masks, boxes, scores, and labels
+    """
+    endpoint = f"{server_url.rstrip('/')}/predict"
+
+    # Convert PIL Image to bytes in memory
+    buffer = io.BytesIO()
+    image.save(buffer, format='JPEG')
+    buffer.seek(0)  # Reset to beginning so it can be read
+
+    files = {'image': (
+        image_name,     # filename label, ex: "frame_001.jpg"
+        buffer,         # file content (bytes in memory)
+        'image/jpeg')}  # MIME type
+    data = {
+        'text_prompt': text_prompt,
+        'confidence_threshold': confidence_threshold
+    }
+    response = requests.post(endpoint, files=files, data=data)
+
+    if response.status_code != 200:
+        raise Exception(f"Server error: {response.status_code} - {response.text}")
+
+    return response.json()
+
+
+def decode_masks(result: dict) -> list:
+    """Decode base64-encoded masks to numpy arrays."""
+    masks = []
+    for mask_b64 in result.get('masks', []):
+        mask_bytes = base64.b64decode(mask_b64)
+        mask_img = Image.open(io.BytesIO(mask_bytes))
+        masks.append(np.array(mask_img))
+    return masks
 
 
 # def visualize_results(image_path: str, result: dict, save_path: str = None):
@@ -173,7 +215,7 @@ def main():
     print(f"Sending image: {args.image}")
     print(f"Text prompt: {args.prompt}")
 
-    result = send_image_for_prediction(
+    result = send_saved_image_for_prediction(
         server_url=args.url,
         image_path=args.image,
         text_prompt=args.prompt,
@@ -189,7 +231,7 @@ def main():
         print(f"  Labels: {result['labels']}")
 
     # Visualize results
-    visualize_results(args.image, result, args.output)
+    # visualize_results(args.image, result, args.output)
 
 
 if __name__ == "__main__":
