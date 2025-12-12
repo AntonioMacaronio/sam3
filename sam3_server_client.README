@@ -6,17 +6,24 @@ Start the server (this machine):
 cd /home/anthony/sam3
 python sam3_server.py
 ```
-
-The model loads once at startup. Server listens on port 8000.
+The server will:
+1. Start ngrok and print the public URL (e.g., https://abc123.ngrok.io)
+2. Load the SAM3 model
+3. Accept image + text prompt requests at /predict
+4. Return masks as base64-encoded PNGs
 
 
 ### Client
-From a client machine:
-from sam3_client import SAM3Client
+On the remote machine:
+pip install requests pillow numpy matplotlib
+python sam3_client.py --url https://abc123.ngrok.io --image photo.jpg --prompt "person"
 
-client = SAM3Client("http://YOUR_SERVER_IP:8000")
-masks = client.predict("image.jpg", "light purple square")
-# masks is numpy array with shape (N, 1, H, W)
+Options:
+- --url - The ngrok URL from the server
+- --image - Local image path
+- --prompt - Text describing what to segment
+- --confidence - Detection threshold (default 0.5)
+- --output - Save visualization to file
 
 Or via command line:
 python sam3_client.py --server http://YOUR_SERVER_IP:8000 --image photo.jpg --prompt "person" --output masks.npy
