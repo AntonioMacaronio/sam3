@@ -20,3 +20,8 @@ masks = client.predict("image.jpg", "light purple square")
 
 Or via command line:
 python sam3_client.py --server http://YOUR_SERVER_IP:8000 --image photo.jpg --prompt "person" --output masks.npy
+
+
+### DIRECT
+export CONDA_PLUGINS_AUTO_ACCEPT_TOS=true
+
