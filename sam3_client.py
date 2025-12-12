@@ -16,7 +16,7 @@ import base64
 import io
 import os
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import requests
 from PIL import Image
@@ -69,77 +69,77 @@ def decode_masks(result: dict) -> list:
     return masks
 
 
-def visualize_results(image_path: str, result: dict, save_path: str = None):
-    """Visualize the segmentation results."""
-    image = Image.open(image_path)
-    masks = decode_masks(result)
+# def visualize_results(image_path: str, result: dict, save_path: str = None):
+#     """Visualize the segmentation results."""
+#     image = Image.open(image_path)
+#     masks = decode_masks(result)
 
-    n_masks = len(masks)
-    if n_masks == 0:
-        print("No detections found!")
-        plt.imshow(image)
-        plt.title(f"No detections for prompt: '{result['prompt']}'")
-        plt.axis('off')
-        if save_path:
-            plt.savefig(save_path, bbox_inches='tight')
-        plt.show()
-        return
+#     n_masks = len(masks)
+#     if n_masks == 0:
+#         print("No detections found!")
+#         plt.imshow(image)
+#         plt.title(f"No detections for prompt: '{result['prompt']}'")
+#         plt.axis('off')
+#         if save_path:
+#             plt.savefig(save_path, bbox_inches='tight')
+#         plt.show()
+#         return
 
-    # Create subplot grid
-    cols = min(3, n_masks + 1)
-    rows = (n_masks + 1 + cols - 1) // cols
+#     # Create subplot grid
+#     cols = min(3, n_masks + 1)
+#     rows = (n_masks + 1 + cols - 1) // cols
 
-    fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 5 * rows))
-    if rows * cols == 1:
-        axes = [axes]
-    else:
-        axes = axes.flatten()
+#     fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 5 * rows))
+#     if rows * cols == 1:
+#         axes = [axes]
+#     else:
+#         axes = axes.flatten()
 
-    # Show original image
-    axes[0].imshow(image)
-    axes[0].set_title(f"Original\nPrompt: '{result['prompt']}'")
-    axes[0].axis('off')
+#     # Show original image
+#     axes[0].imshow(image)
+#     axes[0].set_title(f"Original\nPrompt: '{result['prompt']}'")
+#     axes[0].axis('off')
 
-    # Show each mask
-    scores = result.get('scores', [])
-    labels = result.get('labels', [])
+#     # Show each mask
+#     scores = result.get('scores', [])
+#     labels = result.get('labels', [])
 
-    for i, mask in enumerate(masks):
-        ax = axes[i + 1]
+#     for i, mask in enumerate(masks):
+#         ax = axes[i + 1]
 
-        # Overlay mask on image
-        img_array = np.array(image)
-        overlay = img_array.copy()
-        mask_bool = mask > 127
+#         # Overlay mask on image
+#         img_array = np.array(image)
+#         overlay = img_array.copy()
+#         mask_bool = mask > 127
 
-        # Apply colored mask overlay
-        color = plt.cm.tab10(i % 10)[:3]
-        for c in range(3):
-            overlay[:, :, c] = np.where(
-                mask_bool,
-                overlay[:, :, c] * 0.5 + int(color[c] * 255) * 0.5,
-                overlay[:, :, c]
-            )
+#         # Apply colored mask overlay
+#         color = plt.cm.tab10(i % 10)[:3]
+#         for c in range(3):
+#             overlay[:, :, c] = np.where(
+#                 mask_bool,
+#                 overlay[:, :, c] * 0.5 + int(color[c] * 255) * 0.5,
+#                 overlay[:, :, c]
+#             )
 
-        ax.imshow(overlay.astype(np.uint8))
+#         ax.imshow(overlay.astype(np.uint8))
 
-        title = f"Mask {i + 1}"
-        if i < len(scores):
-            title += f"\nScore: {scores[i]:.3f}"
-        if i < len(labels):
-            title += f"\nLabel: {labels[i]}"
-        ax.set_title(title)
-        ax.axis('off')
+#         title = f"Mask {i + 1}"
+#         if i < len(scores):
+#             title += f"\nScore: {scores[i]:.3f}"
+#         if i < len(labels):
+#             title += f"\nLabel: {labels[i]}"
+#         ax.set_title(title)
+#         ax.axis('off')
 
-    # Hide unused subplots
-    for i in range(n_masks + 1, len(axes)):
-        axes[i].axis('off')
+#     # Hide unused subplots
+#     for i in range(n_masks + 1, len(axes)):
+#         axes[i].axis('off')
 
-    plt.tight_layout()
-    if save_path:
-        plt.savefig(save_path, bbox_inches='tight')
-        print(f"Results saved to: {save_path}")
-    plt.show()
+#     plt.tight_layout()
+#     if save_path:
+#         plt.savefig(save_path, bbox_inches='tight')
+#         print(f"Results saved to: {save_path}")
+#     plt.show()
 
 
 def check_server_health(server_url: str) -> bool:
