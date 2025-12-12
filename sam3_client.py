@@ -72,7 +72,7 @@ class SAM3Client:
                 "image_base64": image_base64,
                 "prompt": prompt,
                 "confidence_threshold": confidence_threshold
-            },u
+            },
             timeout=self.timeout
         )
         response.raise_for_status()
